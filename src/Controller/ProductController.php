@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Product;
+use App\Service;
+use App\Service\ExchangeRate;
 use App\Repository\ProductRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,14 +22,15 @@ class ProductController extends AbstractController
     }
 
     #[Route('/product/{id}', name: 'app_product_details')]
-    public function show(Product $product): Response
+    public function show(Product $product,ExchangeRate $exchangeRate): Response
     {
         //TODO : Convert price of the product into dollar and yen, and send it to the twig template
-
+        $priceUsd=$exchangeRate->convertEurToDollar($product->getPrice());
+        $priceYen=$exchangeRate->convertEurToYen($product->getPrice());
         return $this->render('product/details.html.twig', [
             'product' => $product,
-            'dollar_price' => 0,
-            'yen_price' => 0,
+            'dollar_price' => $priceUsd,
+            'yen_price' => $priceYen,
         ]);
     }
 }
